@@ -30,7 +30,7 @@ switch_n_push:
 	echo "$(YELLOW)Pushing new version to Git...$(RESET)"; \
 	git add .; \
 	git commit -m "New version: $$NEW_VERS"; \
-	git push origin main; \
+	git push origin eug; \
 	echo "$(GREEN)Changes pushed with version $$NEW_VERS$(RESET)"
 
 PHONY: all switch_n_push
