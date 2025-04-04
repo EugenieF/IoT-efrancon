@@ -10,21 +10,31 @@
 #                                                                              #
 # **************************************************************************** #
 
+GREEN=\033[0;32m
+YELLOW=\033[0;33m
+RESET=\033[0m
+
 all: switch push
 
 switch:
 	@CURRENT_VERS=$$(cat deploy.yaml | grep "image:" | rev | cut -c1); \
 	NEW_VERS=$$([ "$$CURRENT_VERS" -eq 1 ] && echo 2 || echo 1); \
-	echo "Switching to tag $$NEW_VERS"; \
-	sed -i "s/wil42\/playground\:v$$CURRENT_VERS/wil42\/playground\:v$$NEW_VERS/g" deploy.yaml; \
+	echo "$(YELLOW)Switching from v$$CURRENT_VERS to v$$NEW_VERS$(RESET)"; \
+	if [ -f deploy.yaml ]; then \
+		if [[ "$$(uname)" == "Darwin" ]]; then \
+			sed -i "" "s/wil42\/playground\:v$$CURRENT_VERS/wil42\/playground\:v$$NEW_VERS/g" deploy.yaml; \
+		else \
+			sed -i "s/wil42\/playground\:v$$CURRENT_VERS/wil42\/playground\:v$$NEW_VERS/g" deploy.yaml; \
+		fi; \
+	fi; \
 	export VERSION=$$NEW_VERS; \
-	echo "Version switched to $$NEW_VERS."
+	echo "$(GREEN)Version switched to v$$NEW_VERS$(RESET)."
 
 push:
-	@echo "Pushing version $$VERSION"
+	@echo "$(YELLOW)Pushing version $$VERSION$(RESET)"
 	@git add .
 	@git commit -m "New version: $$VERSION"
 	@git push origin main
-	@echo "Changes pushed with version $$VERSION."
+	@echo "$(GREEN)Changes pushed with version $$VERSION$(RESET)."
 
 .PHONY: all switch push
