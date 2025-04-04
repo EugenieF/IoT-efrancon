@@ -1,25 +1,54 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wil-playground
+  name: playground-app
   namespace: dev
+  labels:
+    # labels applied to the Deployment object itself, not the Pods
+    # mostly for human readability and for managing/filtering resources
+    app: playground
 spec:
-  replicas: 1
+  replicas: 1  # this is the default
   selector:
+    # only manage Pods that have this label
+    # the Deployment selector can't be changed once it's set
     matchLabels:
-      app: wil-playground
+      app: playground
   template:
     metadata:
       labels:
-        app: wil-playground
+        # labels applied to each Pod created by the Deployment
+        # must match the selector above so the Deployment can manage the Pods
+        # also enable Services to find the right Pods
+        app: playground
     spec:
       containers:
-        - name: wil-playground-container
-          image: wil42/playground:v1
-          ports:
-            - containerPort: 8888
+      - name: playground
+        image: wil42/playground:v1
+        ports:
+        - containerPort: 8888  # the app inside the container listens on this port
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8888
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8888
+          initialDelaySeconds: 5
+          periodSeconds: 5
 
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -27,8 +56,10 @@ metadata:
   namespace: dev
 spec:
   selector:
-    app: wil-playground
+    # this is how the Service knows which Pods to route traffic to
+    app: playground
   ports:
     - protocol: TCP
-      port: 80 # External port for accessing the app
-      targetPort: 8888
+      port: 80  # exposes this port on the service
+      targetPort: 8888  # traffic from 80 is forwarded to the container's 8888
+
