@@ -27,14 +27,15 @@ switch:
 			sed -i "s/wil42\/playground\:v$$CURRENT_VERS/wil42\/playground\:v$$NEW_VERS/g" deploy.yaml; \
 		fi; \
 	fi; \
-	export VERSION=$$NEW_VERS; \
-	echo "$(GREEN)Version switched to v$$NEW_VERS$(RESET)."
+	echo $$NEW_VERS > VERSION; \
+	echo "$(GREEN)Version switched to v$$NEW_VERS$(RESET)"
 
-push:
-	@echo "$(YELLOW)Pushing version $$VERSION$(RESET)"
-	@git add .
-	@git commit -m "New version: $$VERSION"
-	@git push origin main
-	@echo "$(GREEN)Changes pushed with version $$VERSION$(RESET)."
+push:	
+	@echo "$(YELLOW)Pushing new version to Git...$(RESET)"
+	@NEW_VERS=$(cat VERSION); \
+	git add .; \
+	git commit -m "New version: $$NEW_VERS"; \
+	echo "$(GREEN)Changes pushed with version $$NEW_VERS$(RESET)"
+	@rm -f VERSION
 
-.PHONY: all switch push
+PHONY: all switch push
