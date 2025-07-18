@@ -17,14 +17,14 @@ RESET=\033[0m
 all: switch_n_push
 
 switch_n_push:
-	@CURRENT_VERS=$$(cat deploy.yaml | grep "image:" | rev | cut -c1); \
+	@CURRENT_VERS=$$(cat deployment.yaml | grep "image:" | rev | cut -c1); \
 	NEW_VERS=$$([ "$$CURRENT_VERS" -eq 1 ] && echo 2 || echo 1); \
 	echo "$(YELLOW)Switching from v$$CURRENT_VERS to v$$NEW_VERS...$(RESET)"; \
-	if [ -f deploy.yaml ]; then \
+	if [ -f deployment.yaml ]; then \
 		if [[ "$$(uname)" == "Darwin" ]]; then \
-			sed -i "" "s/wil42\/playground\:v$$CURRENT_VERS/wil42\/playground\:v$$NEW_VERS/g" deploy.yaml; \
+			sed -i "" "s/wil42\/playground\:v$$CURRENT_VERS/wil42\/playground\:v$$NEW_VERS/g" deployment.yaml; \
 		else \
-			sed -i "s/wil42\/playground\:v$$CURRENT_VERS/wil42\/playground\:v$$NEW_VERS/g" deploy.yaml; \
+			sed -i "s/wil42\/playground\:v$$CURRENT_VERS/wil42\/playground\:v$$NEW_VERS/g" deployment.yaml; \
 		fi; \
 	fi; \
 	echo "$(YELLOW)Pushing new version to Git...$(RESET)"; \
